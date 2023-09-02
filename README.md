@@ -1,2 +1,3 @@
-# PR-Classification
-Batch Inference Service for PR-classification tasks.
+# (WIP) PR-Copilot
+
+A PR Agent for PR-summary, PR-review.
