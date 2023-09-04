@@ -52,7 +52,9 @@ class PRDeployment:
             item (Item): The POST body should include the url.
         """
         logging.debug("request parameters: {item}")
-        self.summary_pipeline.chat(url=item.url)
+        res = self.summary_pipeline.chat(url=item.url)
+        logging.debug(res)
+        return res
 
 
 deployment = PRDeployment.bind(
