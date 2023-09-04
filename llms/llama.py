@@ -2,7 +2,7 @@ import logging
 
 import torch
 import transformers
-from transformers import LlamaForCausalLM, LlamaTokenizer
+from transformers import AutoTokenizer, LlamaForCausalLM
 
 from llms.chat import Chat, SYSTEM_PROMPT, USER_PROMPT
 
@@ -38,7 +38,7 @@ class LlamaChat(Chat):
         task: str = default_task,
         torch_dtype: torch.dtype = torch.float16,
     ) -> None:
-        self.pipeline = initialize_pipeline(
+        self.pipeline = build_pipeline(
             model_name_or_path=model_name_or_path, task=task, torch_dtype=torch_dtype
         )
 
@@ -50,15 +50,16 @@ class LlamaChat(Chat):
         prompt = LlamaChat.prompt(system_prompt=system_prompt, user_prompt=user_prompt)
 
         logging.debug(
-            f"system_prompt: {system_prompt}, user_prompt: {user_prompt}, final_prompt: {prompt}"
+            f"system_prompt: {system_prompt}\n, user_prompt: {user_prompt}\n, final_prompt: {prompt}\n"
         )
 
         sequences = self.pipeline(
             prompt,
             do_sample=True,
-            top_k=10,
-            num_return_sequences=1,
+            temperature=0.2,
+            top_p=0.9,
             max_length=200,
+            num_return_sequences=1,
         )
 
         # TODO: output the result.
@@ -92,7 +93,7 @@ class LlamaChat(Chat):
         system_prompt: str = None,
         user_prompt: str = None,
     ) -> str:
-        pipeline = initialize_pipeline(
+        pipeline = build_pipeline(
             model_name_or_path=model_name_or_path, task=task, torch_dtype=torch_dtype
         )
         prompt = LlamaChat.prompt(system_prompt=system_prompt, user_prompt=user_prompt)
@@ -104,11 +105,11 @@ class LlamaChat(Chat):
         sequences = pipeline(
             prompt,
             do_sample=True,
-            top_k=10,
-            num_return_sequences=1,
+            temperature=0.2,
+            top_p=0.9,
             max_length=200,
+            num_return_sequences=1,
         )
-
         return sequences
 
 
@@ -139,19 +140,28 @@ def format_llama_prompt(
     return result
 
 
-def initialize_pipeline(
+def build_pipeline(
     model_name_or_path: str,
     task: str,
     torch_dtype: torch.dtype,
 ) -> transformers.pipeline:
-    tokenizer = LlamaTokenizer.from_pretrained(
+    tokenizer = AutoTokenizer.from_pretrained(
         model_name_or_path, trust_remote_code=True
     )
-    model = LlamaForCausalLM.from_pretrained(model_name_or_path, local_files_only=True)
+    model = LlamaForCausalLM.from_pretrained(model_name_or_path).half().cuda().eval()
+
+    logging.info(
+        "Transformer pipeline with model: %s, task: %s, torch_dtype: %s, model dtype: %s",
+        model_name_or_path,
+        task,
+        torch_dtype,
+        model.dtype,
+    )
+
     return transformers.pipeline(
         task=task,
         model=model,
         tokenizer=tokenizer,
         torch_dtype=torch_dtype,
-        device_map="auto",
+        device=0,
     )

@@ -72,8 +72,10 @@ SUMMARY_USER_PROMPT = """
 PR Information:
   Title: {title}
   Description: {description}
-  Commit-Messages: {commit_messages}
-  PR-Diffs: {pr_diffs}
+  Commit-Messages: |-
+{commit_messages}
+  PR-Diffs: |-
+{pr_diffs}
 
 Response(must be a valid {format}, and nothing else):
 """

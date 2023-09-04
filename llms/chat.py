@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 import torch
-import transformers
 
 SYSTEM_PROMPT = "system"
 USER_PROMPT = "user"

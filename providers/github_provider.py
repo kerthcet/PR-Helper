@@ -67,7 +67,9 @@ def get_pr_info(url: str) -> Dict[str, str]:
         headers=headers,
     )
     if pr_resp.status_code != 200:
-        raise Exception("request pull-request status error")
+        raise Exception(
+            "request pull-request error, status code %s", pr_resp.status_code
+        )
     pr_content = pr_resp.json()
     res["title"] = pr_content["title"]
     res["description"] = parse_content(pr_content["body"])
@@ -78,14 +80,16 @@ def get_pr_info(url: str) -> Dict[str, str]:
         headers=headers,
     )
     if commit_resp.status_code != 200:
-        raise Exception("request commits status error")
+        raise Exception(
+            "request commits error, status code %s", commit_resp.status_code
+        )
 
     commit_content = commit_resp.json()
 
     commit_messages = []
     for content in commit_content:
         commit_messages.append(split_line_break(content["commit"]["message"]))
-    res["commit_messages"] = commit_messages
+    res["commit_messages"] = ", ".join(commit_messages)
 
     # request to get diffs.
     diff_resp = requests.get(
@@ -93,7 +97,7 @@ def get_pr_info(url: str) -> Dict[str, str]:
         headers=headers,
     )
     if diff_resp.status_code != 200:
-        raise Exception("request PR diff status error")
+        raise Exception("request PR diff error, status code %s", diff_resp.status_code)
     res["pr_diffs"] = diff_resp.text
 
     return res

@@ -1,3 +1,4 @@
+import logging
 from ray import serve
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -15,7 +16,10 @@ class Item(BaseModel):
 
 @serve.deployment(
     route_prefix="/agent",
-    ray_actor_options={"num_gpus": 0},
+    ray_actor_options={
+        "num_cpus": 1,
+        "num_gpus": 1,
+    },
     autoscaling_config={"min_replicas": 1, "max_replicas": 1},
 )
 @serve.ingress(app)
@@ -47,7 +51,10 @@ class PRDeployment:
         Args:
             item (Item): The POST body should include the url.
         """
+        logging.debug("request parameters: {item}")
         self.summary_pipeline.chat(url=item.url)
 
 
-deployment = PRDeployment.bind(model_name_or_path="/data/models/llama-2-7b-chat-hf/")
+deployment = PRDeployment.bind(
+    model_name_or_path="/models/llama-2-7b-chat-hf", task="text-generation"
+)
