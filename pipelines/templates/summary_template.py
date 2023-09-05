@@ -30,14 +30,23 @@ PR Description:
   type: string
   description: an informative and concise description of the PR
 PR Type:
-  type: string
-  enum:
-    - Feature
-    - Bugfix
-    - Cleanup
-    - Test
-    - Document
-    - Other
+  type: array
+  description: |-
+    The details of pr type are as follows:
+    - Feature: Add new features
+    - Bugfix: Fixes bugs in the program
+    - Cleanup: Clear unnecessary code (function or module)
+    - Test: Test program function
+    - Document: Modifying Document Content
+  items:
+    type: string
+    enum:
+      - Feature
+      - Bugfix
+      - Cleanup
+      - Test
+      - Document
+      - Other
 PR Main Files Walkthrough:
   type: array
   maxItems: 10
@@ -57,7 +66,8 @@ Example output:
 PR Title: ...
 PR Description: |-
   ...
-PR Type: Cleanup
+PR Type:
+  - ...
 PR Main Files Walkthrough:
   - filename: ...
     changes in file: |-
