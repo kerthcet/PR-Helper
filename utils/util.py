@@ -5,6 +5,8 @@ def parse_content(content: str) -> str:
     """
     Remove useless messages from the content, like words wrapped by <!-- -->.
     """
+    if content is None:
+        return None
 
     append = True
     res = ""

@@ -58,14 +58,11 @@ class LlamaChat(Chat):
             do_sample=True,
             temperature=0.2,
             top_p=0.9,
-            max_length=200,
-            num_return_sequences=1,
+            max_length=4090,
+            return_full_text=False,
         )
 
-        # TODO: output the result.
-        for seq in sequences:
-            print(f"Result: {seq['generated_text']}")
-        return sequences
+        return sequences[0]["generated_text"]
 
     @classmethod
     def prompt(
@@ -110,7 +107,7 @@ class LlamaChat(Chat):
             max_length=200,
             num_return_sequences=1,
         )
-        return sequences
+        return sequences[0]["generated_text"]
 
 
 # TODO: trim the tokens when exceeded.

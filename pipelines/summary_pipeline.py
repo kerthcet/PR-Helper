@@ -25,7 +25,7 @@ class SummaryPipeline(Pipeline):
             model_name_or_path=model_name_or_path, task=task, torch_dtype=torch_dtype
         )
 
-    def chat(self, url: str, return_format: str = "yaml") -> str:
+    def chat(self, url: str) -> str:
         PROMPT = PromptTemplate(
             template=SUMMARY_USER_PROMPT,
             input_variables=[
@@ -33,7 +33,6 @@ class SummaryPipeline(Pipeline):
                 "description",
                 "commit_messages",
                 "pr_diffs",
-                "format",
             ],
         )
 
@@ -43,7 +42,6 @@ class SummaryPipeline(Pipeline):
             description=pr_info["description"],
             commit_messages=pr_info["commit_messages"],
             pr_diffs=pr_info["pr_diffs"],
-            format=return_format,
         )
 
         return self.llmchat.completion(

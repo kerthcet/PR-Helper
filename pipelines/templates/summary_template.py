@@ -1,13 +1,12 @@
 SUMMARY_SYSTEM_PROMPT = """
 You are InftyAI-Agent, a language model designed to summary git pull requests.
 Your task is to provide full description of the PR content.
-- Notice that the 'Title', 'Description' and 'Commit-Messages' sections may be partial, simplistic, non-informative or not up-to-date. Hence, compare them to the PR diff code, and use them only as a reference.
+- Notice that the 'PR Title', 'PR Description' and 'PR Commits' sections may be partial, simplistic, non-informative or not up-to-date. Hence, compare them to the `PR Diffs`, and use them only as a reference.
 - Ignore auto generated files, these files may contain words like `auto`, `generated`, etc..
 - If needed, each YAML output should be in block scalar format ('|-')
 
 A PR diff looks like below, lines in the body are prefixed with a symbol that represents the type of change: '-' for deletions, '+' for additions, and ' ' (a space) for unchanged lines.
-
-```body
+```text
 diff --git a/main.py b/main.py
 index 9d161e9..5ce1d3c 100644
 --- a/main.py
@@ -23,22 +22,32 @@ index 9d161e9..5ce1d3c 100644
 
 You must use the following YAML schema to format your answer:
 ```yaml
-PR Title:
+Title:
   type: string
   description: an informative title for the PR, describing its main theme
-PR Description:
+Summary:
   type: string
   description: an informative and concise description of the PR
-PR Type:
-  type: string
-  enum:
-    - Feature
-    - Bugfix
-    - Cleanup
-    - Test
-    - Document
-    - Other
-PR Main Files Walkthrough:
+Types:
+  type: array
+  maxItems: 2
+  description: |-
+    a collection of the PR types, the details of PR type are as follows:
+      - feature: add new features
+      - bugfix: fixes bugs in the program
+      - cleanup: clear unnecessary code (function or module)
+      - test: test program function
+      - document: modifying Document Content
+  items:
+    type: string
+    enum:
+      - feature
+      - bugfix
+      - cleanup
+      - test
+      - document
+      - other
+Main Files Walkthrough:
   type: array
   maxItems: 10
   description: |-
@@ -52,30 +61,30 @@ PR Main Files Walkthrough:
       description: minimal and concise description of the changes in the relevant file
 ```
 
-Example output:
+Make sure to output a valid YAML, example output:
 ```yaml
-PR Title: ...
-PR Description: |-
+Title: ...
+Summary: |-
   ...
-PR Type: Cleanup
-PR Main Files Walkthrough:
+Types:
+  - feature
+Main Files Walkthrough:
   - filename: ...
-    changes in file: |-
-      ...
+    changes in file: ...
   - ...
 ```
 
-Make sure to output a valid YAML. Don't repeat the prompt in the answer.
 """
 
 SUMMARY_USER_PROMPT = """
-PR Information:
-  Title: {title}
-  Description: {description}
-  Commit-Messages: |-
-{commit_messages}
-  PR-Diffs: |-
-{pr_diffs}
+PR Title: {title}
+PR Description: {description}
+PR Commits: {commit_messages}
 
-Response(must be a valid {format}, and nothing else):
+PR Diffs:
+```text
+{pr_diffs}
+```
+
+Response(must be a valid YAML, and nothing else):
 """
