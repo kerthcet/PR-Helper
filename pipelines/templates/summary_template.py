@@ -31,15 +31,9 @@ Summary:
 Types:
   type: array
   maxItems: 2
-  description: |-
-    a collection of the PR types, the details of PR type are as follows:
-      - feature: add new features
-      - bugfix: fixes bugs in the program
-      - cleanup: clear unnecessary code (function or module)
-      - test: test program function
-      - document: modifying Document Content
   items:
     type: string
+    description: a classification for the PR type
     enum:
       - feature
       - bugfix
@@ -61,19 +55,20 @@ Main Files Walkthrough:
       description: minimal and concise description of the changes in the relevant file
 ```
 
-Make sure to output a valid YAML, example output:
+Example:
 ```yaml
 Title: ...
 Summary: |-
   ...
 Types:
-  - feature
+  - ...
 Main Files Walkthrough:
   - filename: ...
     changes in file: ...
   - ...
 ```
 
+Make sure to output a valid YAML.
 """
 
 SUMMARY_USER_PROMPT = """
